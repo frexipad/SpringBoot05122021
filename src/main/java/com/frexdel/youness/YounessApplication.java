@@ -18,7 +18,7 @@ public class YounessApplication {
 	public CommandLineRunner runner(UserRepository userRepository) {
 		return args -> {
 			System.out.println("Starting...........................");
-			userRepository.save(new User(null, "fname", "lname", 85));
+			userRepository.save(new User(null, "fname", "lname","email@email.com", 85));
 
 		};
 
