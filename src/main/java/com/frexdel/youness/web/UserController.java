@@ -3,35 +3,35 @@ package com.frexdel.youness.web;
 import com.frexdel.youness.dao.UserRepository;
 import com.frexdel.youness.model.ResponseHandler;
 import com.frexdel.youness.model.User;
+import com.frexdel.youness.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/user")
 public class UserController {
 
     private final UserRepository userRepository;
+    private final UserService userService;
 
-
-    public UserController(UserRepository userRepository) {
+    @Autowired
+    public UserController(UserRepository userRepository, UserService userService) {
         this.userRepository = userRepository;
+        this.userService = userService;
     }
 
     // Add
     @PostMapping(value = "add")
     public ResponseEntity<Object> addUser(@RequestBody User user) {
         try {
-
-            if (userRepository.existsById(user.getId())) {
-                return ResponseHandler.generateResponse("User Already Exist", HttpStatus.MULTI_STATUS, null);
-
-            }
-            User userResult = userRepository.save(user);
-            return ResponseHandler.generateResponse("Successfully added data!", HttpStatus.OK, userResult);
-
+            if (user.getEmail().length()<=0)return ResponseHandler.generateResponse("Email is required !!", HttpStatus.BAD_REQUEST, null);
+            User savedUser = userService.addUser(user);
+            return ResponseHandler.generateResponse("User saved successfully",HttpStatus.OK,savedUser);
         } catch (Exception e) {
             return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.MULTI_STATUS, null);
         }
@@ -41,7 +41,7 @@ public class UserController {
     @GetMapping(value = "/users")
     public ResponseEntity<Object> Get() {
         try {
-            List<User> result = userRepository.findAll();
+            List<User> result = userService.getAllUser();
             return ResponseHandler.generateResponse("Successfully retrieved data!", HttpStatus.OK, result);
         } catch (Exception e) {
             return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.MULTI_STATUS, null);
@@ -51,12 +51,14 @@ public class UserController {
 
     // Get By ID
     @GetMapping(value = "/users/{id}")
-    public ResponseEntity<Object> Get(@PathVariable int id) {
+    public ResponseEntity<Object> Get(@PathVariable Long id) {
         try {
-            User result = userRepository.findById(Long.valueOf(id)).orElse(null);
-            if (result==null)return ResponseHandler.generateResponse("User dont Exist!!",HttpStatus.MULTI_STATUS,null);
-            result = userRepository.getById(Long.valueOf(id));
-            return ResponseHandler.generateResponse("Successfully retrieved data!", HttpStatus.OK, result);
+            Optional<User> userById = userService.getUserById(id);
+            if (userById.isPresent()){
+                return ResponseHandler.generateResponse("request successfuly ",HttpStatus.OK,userById);
+            }else {
+                return new ResponseEntity<Object>("User not found",HttpStatus.NOT_FOUND);
+            }
         } catch (Exception e) {
             return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.MULTI_STATUS, null);
         }

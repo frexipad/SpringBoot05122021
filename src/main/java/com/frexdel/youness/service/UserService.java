@@ -5,7 +5,9 @@ import com.frexdel.youness.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService implements IUserService {
@@ -19,17 +21,24 @@ public class UserService implements IUserService {
 
     @Override
     public User addUser(User user) {
-        return null;
+        User save = userRepository.save(user);
+        return save;
     }
 
     @Override
     public List<User> getAllUser() {
-        return null;
+        List<User> userList = userRepository.findAll();
+        if (userList.size()>0){
+            return userList;
+        }else {
+            return new ArrayList<User>();
+        }
     }
 
     @Override
-    public User getUserById(Long id) {
-        return null;
+    public Optional<User> getUserById(Long id) {
+        Optional<User> user = userRepository.findById(id);
+        return user;
     }
 
     @Override

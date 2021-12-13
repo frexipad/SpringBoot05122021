@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 
 @Entity
@@ -19,6 +20,7 @@ public class User implements Serializable {
     private Long id;
     private String firstName;
     private String lastName;
+    //@NotBlank(message = "Name is mandatory")
     private String email;
     private int age;
 
